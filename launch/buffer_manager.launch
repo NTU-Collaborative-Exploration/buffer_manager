@@ -1,0 +1,37 @@
+<launch>
+    <param name="is_respawn" value="false"/>
+     
+    <!-- <arg name="robot_id" default="1"/> -->
+    <arg name="robot_id" value="$(env ROBOT_ID)"/>
+    <arg name="ip_to_query" default="192.168.1.11"/>
+    <arg name="submap_tp_in" default="submap_raw"/>
+    <arg name="submap_tp_out" default="submap"/>
+    <arg name="colormap_tp_in" default="submap_raw"/>
+    <arg name="colormap_tp_out" default="submap"/>
+
+    <arg name="logger_level" default="Info"/>
+    <arg name="buffer_size_limit" default="20"/>
+    <arg name="timeout_limit_ms" default="5000"/>
+
+    <include file="$(find buffer_manager)/launch/buffer_manager_submap.launch">
+      <arg name="ip_to_query" value="$(arg ip_to_query)"/>
+      <arg name="msg_tp_in" value="$(arg submap_tp_in)"/>
+      <arg name="msg_tp_out" value="$(arg submap_tp_out)"/>
+      <arg name="msg_ns" value="submap"/>
+      <arg name="logger_level" value="$(arg logger_level)"/>
+
+      <arg name="buffer_size_limit" value="$(arg buffer_size_limit)"/>
+      <arg name="timeout_limit_ms" value="$(arg timeout_limit_ms)"/>
+    </include>
+
+    <include file="$(find buffer_manager)/launch/buffer_manager_colormap.launch">
+      <arg name="ip_to_query" value="$(arg ip_to_query)"/>
+      <arg name="msg_tp_in" value="$(arg colormap_tp_in)"/>
+      <arg name="msg_tp_out" value="$(arg colormap_tp_out)"/>
+      <arg name="msg_ns" value="colormap"/>
+      <arg name="logger_level" value="$(arg logger_level)"/>
+
+      <arg name="buffer_size_limit" value="$(arg buffer_size_limit)"/>
+      <arg name="timeout_limit_ms" value="$(arg timeout_limit_ms)"/>
+    </include>
+</launch>

@@ -1,6 +1,4 @@
 <launch>
-    <param name="is_respawn" value="false"/>
-     
     <arg name="robot_id" default="1"/>
     <!-- <arg name="robot_id" value="$(env ROBOT_ID)"/> -->
     <arg name="ip_to_query" default="192.168.1.11"/>
@@ -8,12 +6,13 @@
     <arg name="msg_tp_out" default="colormap_new"/>
     <arg name="msg_ns" default="colormap"/>
     <arg name="logger_level" default="Debug"/>
-
+    
     <arg name="buffer_size_limit" default="20"/>
     <arg name="timeout_limit_ms" default="5000"/>
+    <param name="/$(arg msg_ns)/is_respawn" value="false"/>
 
     <group ns="robot_$(arg robot_id)">
-        <node pkg="buffer_manager" type="buffer_manager_node"  name="buffer_manager" output="screen" respawn="true" ns="$(arg msg_ns)">
+        <node pkg="buffer_manager" type="buffer_manager_node"  name="buffer_manager" output="screen" respawn="true" ns="$(arg msg_ns)">            
             <param name="logger_level" value="$(arg logger_level)"/>
             <param name="msg_ns_" value="$(arg msg_ns)"/>
 

@@ -123,7 +123,7 @@ BufferManager<MSG_T>::BufferManager(ros::NodeHandle priv_nh)
     ROS_INFO("timeout_limit_ms_: %d", timeout_limit_ms_);
 
     // check if this node respawned
-    ros::param::get("/is_respawn", is_respawn_);
+    ros::param::get("/" + msg_ns_ + "/is_respawn", is_respawn_);
     ROS_INFO("is_respawn_: %d", is_respawn_);
     if(is_respawn_){
         ROS_INFO("[%s]recover buffer from file", msg_ns_.c_str());
