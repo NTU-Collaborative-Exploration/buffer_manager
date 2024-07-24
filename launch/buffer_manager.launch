@@ -1,8 +1,8 @@
 <launch>
     <param name="is_respawn" value="false"/>
      
-    <!-- <arg name="robot_id" default="1"/> -->
-    <arg name="robot_id" value="$(env ROBOT_ID)"/>
+    <arg name="robot_id" default="1"/>
+    <!-- <arg name="robot_id" value="$(env ROBOT_ID)"/> -->
     <arg name="ip_to_query" default="192.168.1.11"/>
     <arg name="submap_tp_in" default="submap_raw"/>
     <arg name="submap_tp_out" default="submap"/>
