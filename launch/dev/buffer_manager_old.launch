@@ -1,0 +1,40 @@
+<launch>
+    <param name="is_respawn" value="false"/>
+    
+    <arg name="robot_id" default="1"/>
+    <!-- <arg name="robot_id" value="$(env ROBOT_ID)"/> -->
+    <arg name="ip_to_query" default="192.168.1.11"/>
+    <arg name="submap_tp_in" default="submap"/>
+    <arg name="submap_tp_out" default="submap_new"/>
+    <arg name="colormap_tp_in" default="colormap"/>
+    <arg name="colormap_tp_out" default="colormap_new"/>
+
+    <arg name="submap_backup_filename" default="submap_msg_backup.dat"/>
+    <arg name="last_sent_submap_id_filename" default="last_sent_submap_id.dat"/>
+    <arg name="colormap_backup_filename" default="colormap_msg_backup.dat"/>
+    <arg name="last_sent_colormap_id_filename" default="last_sent_colormap_id.dat"/>
+
+    <arg name="buffer_size_limit" default="20"/>
+    <arg name="timeout_limit_ms" default="5000"/>
+
+    <group ns="robot_$(arg robot_id)">
+        <node pkg="buffer_manager" type="buffer_manager_node"  name="buffer_manager" output="screen" respawn="true">
+            <param name="ip_to_query_" value="$(arg ip_to_query)"/>
+            <param name="buffer_size_limit_" value="$(arg buffer_size_limit)"/>
+            <param name="timeout_limit_ms_" value="$(arg timeout_limit_ms)"/>
+
+            <param name="submap_tp_in_" value="/robot_$(arg robot_id)/$(arg submap_tp_in)"/>
+            <param name="submap_tp_out_" value="/robot_$(arg robot_id)/$(arg submap_tp_out)"/>
+            <param name="colormap_tp_in_" value="/robot_$(arg robot_id)/$(arg colormap_tp_in)"/>
+            <param name="colormap_tp_out_" value="/robot_$(arg robot_id)/$(arg colormap_tp_out)"/>
+
+            <param name="submap_backup_filename_" value="$(find buffer_manager)/data/$(arg submap_backup_filename)"/>
+            <param name="last_sent_submap_id_filename_" value="$(find buffer_manager)/data/$(arg last_sent_submap_id_filename)"/>
+            <param name="colormap_backup_filename_" value="$(find buffer_manager)/data/$(arg colormap_backup_filename)"/>
+            <param name="last_sent_colormap_id_filename_" value="$(find buffer_manager)/data/$(arg last_sent_colormap_id_filename)"/>
+
+
+            <param name="logger_level" value="Debug"/>
+        </node>
+    </group>
+</launch>

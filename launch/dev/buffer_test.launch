@@ -1,0 +1,15 @@
+<launch>
+    <param name="is_respawn" value="false"/>
+    
+    <arg name="ip_to_query" default="192.168.1.11"/>
+    <arg name="test_msg_backup_filename" default="test_msg_backup.dat"/>
+
+    <node pkg="buffer_manager" type="buffer_test_node"  name="buffer_test_node" output="screen" respawn="true">
+        <param name="ip_to_query_" value="$(arg ip_to_query)"/>
+        <param name="test_in_tp_" value="/test_msg"/>
+        <param name="test_msg_backup_filename_" value="$(find buffer_manager)/data/$(arg test_msg_backup_filename)"/>
+        <param name="last_sent_filename_" value="$(find buffer_manager)/data/last_sent.dat"/>
+    
+    </node>
+
+</launch>
