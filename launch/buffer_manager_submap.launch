@@ -1,7 +1,7 @@
 <launch>
     <arg name="robot_id" default="1"/>
     <!-- <arg name="robot_id" value="$(env ROBOT_ID)"/> -->
-    <arg name="ip_to_query" default="192.168.1.11"/>
+    <arg name="ip_to_query" default="192.168.1.100"/>
     <arg name="msg_tp_in" default="submap_raw"/>
     <arg name="msg_tp_out" default="submap"/>
     <arg name="msg_ns" default="submap"/>
