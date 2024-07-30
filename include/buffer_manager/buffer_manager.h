@@ -105,7 +105,7 @@ BufferManager<MSG_T>::BufferManager(ros::NodeHandle priv_nh)
 {
     // get params from launch file
     priv_nh.param<std::string>("msg_ns_", msg_ns_, "");
-    priv_nh.param<std::string>("ip_to_query_", ip_to_query_, "192.168.1.11");
+    priv_nh.param<std::string>("ip_to_query_", ip_to_query_, "192.168.1.100");
     priv_nh.param<std::string>("msg_tp_in_", msg_tp_in_, "/robot_1/submap_raw");
     priv_nh.param<std::string>("msg_tp_out_", msg_tp_out_, "/robot_1/submap");
     priv_nh.param<std::string>("msg_backup_filename_", msg_backup_filename_, "submap_backup.dat");
@@ -363,12 +363,17 @@ void BufferManager<MSG_T>::pingClient(const ros::TimerEvent &)
         is_connected_ = true;
         last_connected_time_ = std::chrono::steady_clock::now();
         socket.close();
+        ROS_DEBUG("[%s]!!Connected with %s", msg_ns_.c_str(), ip_to_query_.c_str());
     }
-    catch (...)
-    {
+    catch (const boost::system::system_error& e) {
         is_connected_ = false;
-        ROS_WARN("[%s]!!Disonnected with %s", msg_ns_.c_str(), ip_to_query_.c_str());
+        ROS_WARN("[%s] Connection failed: %s", msg_ns_.c_str(), e.what());
     }
+    // catch (...)
+    // {
+    //     is_connected_ = false;
+    //     ROS_WARN("[%s]!!Disonnected with %s", msg_ns_.c_str(), ip_to_query_.c_str());
+    // }
 
     // check timeout
     if (!is_connected_) 
