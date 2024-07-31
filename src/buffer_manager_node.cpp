@@ -42,7 +42,7 @@ int main(int argc, char** argv)
     }
 
     // BufferManager<dislam_msgs::SubMap> buffer_manager_node(priv_nh);
-    ros::AsyncSpinner spinner(0); // use all threads
+    ros::AsyncSpinner spinner(4); // use all threads
     spinner.start();
     ros::waitForShutdown();
     return 0;
