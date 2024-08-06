@@ -30,6 +30,7 @@ private:
     std::string last_sent_id_filename_;
     int buffer_size_limit_;
     int timeout_limit_ms_; // unit: ms
+    int reconnect_wait_ms_;
     std::string msg_ns_;
 
     /* publisher */
@@ -52,11 +53,14 @@ private:
     std::string ip_to_query_;
     boost::asio::io_service io_service_;
     std::chrono::steady_clock::time_point last_connected_time_;
-    bool is_connected_;
+    bool is_connected_ = true;
+    bool last_connect_status_ = true;
+    int reconnect_waited_count_;
 
     /* counter */
     uint32_t last_sent_id_;
     uint32_t msg_backup_count_;
+    int total_sent_count_ = 0;
 
 public:
     /**
@@ -112,6 +116,8 @@ BufferManager<MSG_T>::BufferManager(ros::NodeHandle priv_nh)
     priv_nh.param<std::string>("last_sent_id_filename_", last_sent_id_filename_, "last_sent_submap_id.dat");
     priv_nh.param("buffer_size_limit_", buffer_size_limit_, 20);
     priv_nh.param("timeout_limit_ms_", timeout_limit_ms_, 5000);
+    priv_nh.param("reconnect_wait_ms_", reconnect_wait_ms_, 300);
+    reconnect_waited_count_ = reconnect_wait_ms_;
 
     ROS_INFO("msg_ns_: %s", msg_ns_.c_str());
     ROS_INFO("ip_to_query_: %s", ip_to_query_.c_str());
@@ -121,6 +127,7 @@ BufferManager<MSG_T>::BufferManager(ros::NodeHandle priv_nh)
     ROS_INFO("last_sent_id_filename_: %s", last_sent_id_filename_.c_str());
     ROS_INFO("buffer_size_limit: %d", buffer_size_limit_);
     ROS_INFO("timeout_limit_ms_: %d", timeout_limit_ms_);
+    ROS_INFO("reconnect_wait_ms_: %d", reconnect_wait_ms_);
 
     // check if this node respawned
     ros::param::get("/" + msg_ns_ + "/is_respawn", is_respawn_);
@@ -298,6 +305,12 @@ void BufferManager<MSG_T>::msgPublish(const ros::TimerEvent &)
     std::lock_guard<std::mutex> lock(msg_buffer_mutex_);
     if(is_connected_ && msg_pub_.getNumSubscribers() > 0 && !msg_buffer_.empty())
     {
+        if(reconnect_waited_count_ < reconnect_wait_ms_)
+        {
+            ROS_DEBUG("[%s/msgPub]reconnect_waited_count_: %d", msg_ns_.c_str(), reconnect_waited_count_);
+            ++reconnect_waited_count_;
+            return;
+        }
         ROS_DEBUG("[%s/msgPub]backup count: %d; last sent: %d", msg_ns_.c_str(), msg_backup_count_, last_sent_id_);
         if (msg_buffer_.size() >= buffer_size_limit_ && msg_backup_count_ > last_sent_id_ + buffer_size_limit_)
         { // pub from file
@@ -345,6 +358,9 @@ void BufferManager<MSG_T>::msgPublish(const ros::TimerEvent &)
             ++last_sent_id_;
             ROS_DEBUG("[%s/msgPub] buffer size after: %d", msg_ns_.c_str(), msg_buffer_.size());
         }
+        ROS_DEBUG("[%s/msgPub] last sent: %d", msg_ns_.c_str(), last_sent_id_);
+        ++total_sent_count_;
+        ROS_DEBUG("[%s/msgPub] total sent count: %d", msg_ns_.c_str(), total_sent_count_);
         saveLastSentId();
     }
     removeOutdateMsgFromDisk();
@@ -353,6 +369,7 @@ void BufferManager<MSG_T>::msgPublish(const ros::TimerEvent &)
 template <typename MSG_T>
 void BufferManager<MSG_T>::pingClient(const ros::TimerEvent &)
 {
+    std::lock_guard<std::mutex> lock(msg_buffer_mutex_);
     try
     {
         boost::asio::ip::tcp::socket socket(io_service_);
@@ -363,7 +380,13 @@ void BufferManager<MSG_T>::pingClient(const ros::TimerEvent &)
         is_connected_ = true;
         last_connected_time_ = std::chrono::steady_clock::now();
         socket.close();
-        ROS_DEBUG("[%s]!!Connected with %s", msg_ns_.c_str(), ip_to_query_.c_str());
+        if (!last_connect_status_)
+        {
+            reconnect_waited_count_ = 0;
+            ROS_WARN("[%s]!!Re-Connected with %s", msg_ns_.c_str(), ip_to_query_.c_str());
+        }
+        else
+            ROS_DEBUG("[%s]!!Connected with %s", msg_ns_.c_str(), ip_to_query_.c_str());
     }
     catch (const boost::system::system_error& e) {
         is_connected_ = false;
@@ -374,7 +397,6 @@ void BufferManager<MSG_T>::pingClient(const ros::TimerEvent &)
     //     is_connected_ = false;
     //     ROS_WARN("[%s]!!Disonnected with %s", msg_ns_.c_str(), ip_to_query_.c_str());
     // }
-
     // check timeout
     if (!is_connected_) 
     {
@@ -384,6 +406,8 @@ void BufferManager<MSG_T>::pingClient(const ros::TimerEvent &)
             ROS_WARN("[%s]TIME OUT! time: %fs", msg_ns_.c_str(), float(duration.count()/1000.0f));
         }
     }
+
+    last_connect_status_ = is_connected_;
 }
 
 #endif

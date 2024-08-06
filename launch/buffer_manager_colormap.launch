@@ -9,6 +9,7 @@
     
     <arg name="buffer_size_limit" default="20"/>
     <arg name="timeout_limit_ms" default="5000"/>
+    <arg name="reconnect_wait_ms" default="50"/>
     <param name="/$(arg msg_ns)/is_respawn" value="false"/>
 
     <group ns="robot_$(arg robot_id)">
@@ -19,6 +20,7 @@
             <param name="ip_to_query_" value="$(arg ip_to_query)"/>
             <param name="buffer_size_limit_" value="$(arg buffer_size_limit)"/>
             <param name="timeout_limit_ms_" value="$(arg timeout_limit_ms)"/>
+            <param name="reconnect_wait_ms_" value="$(arg reconnect_wait_ms)"/>
 
             <param name="msg_tp_in_" value="/robot_$(arg robot_id)/$(arg msg_tp_in)"/>
             <param name="msg_tp_out_" value="/robot_$(arg robot_id)/$(arg msg_tp_out)"/>

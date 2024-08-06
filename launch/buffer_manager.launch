@@ -12,6 +12,7 @@
     <arg name="logger_level" default="Info"/>
     <arg name="buffer_size_limit" default="20"/>
     <arg name="timeout_limit_ms" default="5000"/>
+    <arg name="reconnect_wait_ms" default="50"/>
 
     <include file="$(find buffer_manager)/launch/buffer_manager_submap.launch">
       <arg name="robot_id" value="$(arg robot_id)"/>
@@ -23,6 +24,7 @@
 
       <arg name="buffer_size_limit" value="$(arg buffer_size_limit)"/>
       <arg name="timeout_limit_ms" value="$(arg timeout_limit_ms)"/>
+      <arg name="reconnect_wait_ms" value="$(arg reconnect_wait_ms)"/>
     </include>
 
     <include file="$(find buffer_manager)/launch/buffer_manager_colormap.launch">
@@ -35,5 +37,6 @@
 
       <arg name="buffer_size_limit" value="$(arg buffer_size_limit)"/>
       <arg name="timeout_limit_ms" value="$(arg timeout_limit_ms)"/>
+      <arg name="reconnect_wait_ms" value="$(arg reconnect_wait_ms)"/>
     </include>
 </launch>
